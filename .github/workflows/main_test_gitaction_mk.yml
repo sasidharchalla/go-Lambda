@@ -55,9 +55,8 @@ jobs:
     
    - name: codebuld    
      run: |
-       for added_modified_file in "${steps.added-files.outputs.addfiles[@]}"; do
-         echo "Do something with this ${added_modified_file}."
-       done
+
+         echo "Do something with this ${steps.added-files.outputs.addfiles[0]}."
        
 
 
