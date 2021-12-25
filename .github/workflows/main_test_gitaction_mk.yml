@@ -4,7 +4,7 @@ on:
   branches: 
     - main
   paths:
-    - backend/lambda/**
+    - backend/lambda/**/*.go
 env:
   Deploy_Route_Url: ${{secrets.AWS_DEPLOY_DEV_ENV}}
   Lambda_Location: "backend/lambda/"
@@ -60,7 +60,6 @@ jobs:
        for added_modified_file in "${added_modified_files[@]}"; do
          if [[  $(awk -v a="${added_modified_file}" -v b="${{env.Lambda_Location}}" 'BEGIN{print index(a,b)}') -eq 1 ]]; then 
          echo "${added_modified_file}";
-         fi
-       
+         else
+          echo "Invalid file"       
        done
-
