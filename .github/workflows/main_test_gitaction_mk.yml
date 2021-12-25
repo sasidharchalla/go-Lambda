@@ -8,6 +8,7 @@ on:
 env:
   Deploy_Route_Url: ${{secrets.AWS_DEPLOY_DEV_ENV}}
   Lambda_Location: "backend/lambda/"
+  region_to_deploy_lambdas: "ap-south-1"
 
 jobs:
  build:
@@ -53,14 +54,31 @@ jobs:
        go mod init leapfrog-backend-Go-Lambdas
        go mod tidy
     
+   - name: Configure AWS Credentials
+     uses: aws-actions/configure-aws-credentials@v1
+     with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{secrets.AWS_DEFAULT_REGION}}
+
    - name: codebuld    
      run: |
        env GOOS=linux
        readarray -t added_modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
        for added_modified_file in "${added_modified_files[@]}"; do
-         if [[  $(awk -v a="${added_modified_file}" -v b="${{env.Lambda_Location}}" 'BEGIN{print index(a,b)}') -eq 1 ]]; then 
+         if [[  $(awk -v a="${added_modified_file}" -v b="${{env.Lambda_Location}}" 'BEGIN{print index(a,b)}') -eq 1 ]]; then
+         echo "Building ${added_modified_file}"
          go build -o ${added_modified_file} ${added_modified_file};
+
+         echo "Zipping ${added_modified_file}"
          zip ${added_modified_file}.zip ${added_modified_file}
-         cat ${added_modified_file}.zip
-         fi    
+
+         echo "Name of the go function"
+         funcname=$(basename -s .go ${added_modified_file})
+
+         echo "Deploying into AWS"
+         aws lambda update-function-code --function-name "${{env.Deploy_Route_Url}}-$funcname" --region {{env.region_to_deploy_lambdas}} --zip-file fileb://${added_modified_file}.zip
+         
+         echo "Deployment of $funcname Success"
+         fi  
        done
