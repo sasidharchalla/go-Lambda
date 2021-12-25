@@ -29,14 +29,18 @@ jobs:
      with:
        format: 'csv'
 
-   - name: verify files
+   - name: Files in single string
+     run: |
+       printf '%s,' '${{ steps.files.outputs.added_modified }}'
+
+   - name: Added files
      run: |
        mapfile -d ',' -t added_modified_files < <(printf '%s,' '${{ steps.files.outputs.added_modified }}')
        for added_modified_file in "${added_modified_files[@]}"; do
          echo "Do something with this ${added_modified_file}."
        done
    
-   - name: verify removed files
+   - name: Removed files
      run: |
        mapfile -d ',' -t removed_files < <(printf '%s,' '${{ steps.files.outputs.removed }}')
        for removed_file in "${removed_files[@]}"; do
@@ -56,5 +60,11 @@ jobs:
      
   #      go mod init leapfrog-backend-Go-Lambdas
   #      go mod tidy
+    
+  #  - name: codebuld    
+  #    run: |
+  #      env GOOS=linux
+
+
  
      
