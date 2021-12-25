@@ -79,8 +79,6 @@ jobs:
          echo "Checking if $funcname already exists"
          found=$(aws lambda list-functions --region ${{env.region_to_deploy_lambdas}} --query 'Functions[*].FunctionName'|grep $funcname)
 
-         echo Found value is $found
-
          echo "Deploying into AWS"
          if [[ -z $found ]]; then
 
