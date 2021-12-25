@@ -80,21 +80,22 @@ jobs:
          found=$(aws lambda list-functions --no-verify-ssl --region ${{env.region_to_deploy_lambdas}} --query 'Functions[?starts_with(FunctionName, `$funcname`) == `true`].FunctionName'|grep $funcname)
 
          echo "Deploying into AWS"
-         if [[ $found -neq null ]]; then
+         if [[ -z $found ]]; then
 
-         aws lambda update-function-code --function-name "$funcname"  \
-         --region ${{env.region_to_deploy_lambdas}} \
-         --zip-file fileb://${added_modified_file}.zip
-
-         echo "Update of $funcname Success"
-
-         else
          aws lambda create-function --function-name "$funcname" --runtime go1.x \
          --handler $funcname.handler --region ${{env.region_to_deploy_lambdas}} \
          --role arn:aws:iam::740915728773:role/service-role/hello-role-xshw5xbe \
          --zip-file fileb://${added_modified_file}.zip
 
          echo "Creation of $funcname Success"
+         
+         else
+
+         aws lambda update-function-code --function-name "$funcname"  \
+         --region ${{env.region_to_deploy_lambdas}} \
+         --zip-file fileb://${added_modified_file}.zip
+
+         echo "Update of $funcname Success"
          fi
          fi
        done
