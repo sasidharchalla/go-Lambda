@@ -58,7 +58,8 @@ jobs:
      run: |
        readarray -t added_modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
        for added_modified_file in "${added_modified_files[@]}"; do
-           echo "Hi"
+         if[[ $(echo ${added_modified_file}|grep -b -o ${{env.Lambda_Location}}|awk 'BEGIN {FS=":"}{print $1}') -eq 0 ]]; then
            echo "${added_modified_file}"
+         fi
        done
 
