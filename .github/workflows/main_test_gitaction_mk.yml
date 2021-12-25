@@ -67,35 +67,35 @@ jobs:
        readarray -t added_modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
        for added_modified_file in "${added_modified_files[@]}"; do
          if [[  $(awk -v a="${added_modified_file}" -v b="${{env.Lambda_Location}}" 'BEGIN{print index(a,b)}') -eq 1 ]]; then
-         echo "Building ${added_modified_file}"
-         go build -o ${added_modified_file} ${added_modified_file};
+           echo "Building ${added_modified_file}"
+           go build -o ${added_modified_file} ${added_modified_file};
 
-         echo "Zipping ${added_modified_file}"
-         zip ${added_modified_file}.zip ${added_modified_file}
+           echo "Zipping ${added_modified_file}"
+           zip ${added_modified_file}.zip ${added_modified_file}
 
-         echo "Name of the go function"
-         funcname=$(basename -s .go ${added_modified_file})
+           echo "Name of the go function"
+           funcname=$(basename -s .go ${added_modified_file})
 
-         echo "Checking if $funcname already exists"
-         found=$(aws lambda list-functions --region ${{env.region_to_deploy_lambdas}} --query 'Functions[*].FunctionName'|grep $funcname)
+           echo "Checking if $funcname already exists"
+           found=$(aws lambda list-functions --region ${{env.region_to_deploy_lambdas}} --query 'Functions[*].FunctionName'|grep $funcname)
 
-         echo "Deploying into AWS"
-         if [[ -z $found ]]; then
+           echo "Deploying into AWS"
+           if [[ -z $found ]]; then
 
-         aws lambda create-function --function-name "$funcname" --runtime go1.x \
-         --handler $funcname.handler --region ${{env.region_to_deploy_lambdas}} \
-         --role arn:aws:iam::740915728773:role/service-role/hello-role-xshw5xbe \
-         --zip-file fileb://${added_modified_file}.zip
+             aws lambda create-function --function-name "$funcname" --runtime go1.x \
+             --handler $funcname.handler --region ${{env.region_to_deploy_lambdas}} \
+             --role arn:aws:iam::740915728773:role/service-role/hello-role-xshw5xbe \
+             --zip-file fileb://${added_modified_file}.zip
 
-         echo "Creation of $funcname Success"
+             echo "Creation of $funcname Success"
          
-         else
+           else
 
-         aws lambda update-function-code --function-name "$funcname"  \
-         --region ${{env.region_to_deploy_lambdas}} \
-         --zip-file fileb://${added_modified_file}.zip
+             aws lambda update-function-code --function-name "$funcname"  \
+             --region ${{env.region_to_deploy_lambdas}} \
+             --zip-file fileb://${added_modified_file}.zip
 
-         echo "Update of $funcname Success"
-         fi
+             echo "Update of $funcname Success"
+           fi
          fi
        done
