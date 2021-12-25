@@ -1,0 +1,324 @@
+name: CI
+on:
+ push:
+  branches: 
+    - Dev-Migration
+  paths:
+    - backend/lambda/**
+env:
+  Deploy_Route_Url: ${{secrets.AWS_DEPLOY_DEV_ENV}}
+
+jobs:
+ build:
+ 
+  runs-on: ubuntu-latest
+  strategy: 
+    matrix:
+      go-version: [1.17]
+  steps:
+   - name: check the code
+     uses: actions/Checkout@v2
+     
+   - name: test
+     run: echo "tested"
+   - name: setup go
+
+     uses: actions/setup-go@v2
+     with:
+       go-version: ${{ matrix.go-version }}
+     env:
+      GO111MODULE: "on"
+   - name: check setup
+     run: |
+     
+       go mod init leapfrog-backend-Go-Lambdas
+       go mod tidy
+      
+   - name: codebuld    
+     run: |
+      env GOOS=linux
+      ## Debitnote --------------------#
+      go build  'backend/lambda/DebitNoteModule/getGCDebitNoteCreationInfo.go'
+      go build  'backend/lambda/DebitNoteModule/insertOrEditGCDebitNoteDetail.go'
+      go build  'backend/lambda/DebitNoteModule/listGCDebitNoteDetails.go'
+      go build  'backend/lambda/DebitNoteModule/updateGcDebitNoteStatus.go'
+      go build  'backend/lambda/DebitNoteModule/viewGCDebitNoteDetail.go'
+
+      #  GC-------------------#
+      go build  'backend/lambda/GCModule/getGCCreationInfo.go'
+      go build  'backend/lambda/GCModule/insertOrEditGCDetail.go'
+      go build  'backend/lambda/GCModule/listGCDetails.go'
+      go build  'backend/lambda/GCModule/viewGCDetail.go'
+
+      # Quotation----------------#
+      go build  'backend/lambda/QuotationModule/getAllQuoteLineItems.go'
+      go build  'backend/lambda/QuotationModule/getAllQuotes.go'
+      go build  'backend/lambda/QuotationModule/getQuotationCreationInfo.go'
+      go build  'backend/lambda/QuotationModule/getQuoteLineCreationInfo.go'
+      go build  'backend/lambda/QuotationModule/insertQuotationDetail.go'
+      go build  'backend/lambda/QuotationModule/insertQuoteLineItemDetail.go'
+      go build  'backend/lambda/QuotationModule/listApprovedQtLinesOnGc.go'
+      go build  'backend/lambda/QuotationModule/updateQuotationStatus.go'
+      go build  'backend/lambda/QuotationModule/updateQuoteLineInfo.go'
+
+      # Sample request--------------#
+      go build  'backend/lambda/SampleRequestModule/getAllSampleRequests.go'
+      go build  'backend/lambda/SampleRequestModule/getcreateSRItemForm.go'
+      go build  'backend/lambda/SampleRequestModule/insertOrUpdateSampleLineItem.go'
+      go build  'backend/lambda/SampleRequestModule/insertOrUpdateSampleRequest.go'
+      go build  'backend/lambda/SampleRequestModule/viewAndDeleteSampleLineItem.go'
+      go build  'backend/lambda/SampleRequestModule/viewSampleRequest.go'
+      
+      # Supplier----------#
+      go build  'backend/lambda/SupplierModule/cvuSupplier.go'
+      go build  'backend/lambda/SupplierModule/listSuppliers.go'
+
+      # User-----------------#
+      go build  'backend/lambda/userModule/changePassword.go'
+      go build  'backend/lambda/userModule/confirmForgotPassword.go'
+      go build  'backend/lambda/userModule/disableUser.go'
+      go build  'backend/lambda/userModule/enableUser.go'
+      go build  'backend/lambda/userModule/forgotPassword.go'
+      go build  'backend/lambda/userModule/getUserDetail.go'
+      go build  'backend/lambda/userModule/getUserRole.go'
+      go build  'backend/lambda/userModule/getDepartmentNames.go'
+      go build  'backend/lambda/userModule/getDivisions.go'
+      go build  'backend/lambda/userModule/getDelegatedApprover.go'
+      go build  'backend/lambda/userModule/insertUserDetails.go'
+      go build  'backend/lambda/userModule/login.go'
+      go build  'backend/lambda/userModule/registration.go'
+      go build  'backend/lambda/userModule/getUsers.go'
+      
+      
+      # Leads--------------#
+      go build  'backend/lambda/Leads_Module/getContactsInLeadtoAcc/getContactsInLeadtoAcc.go'
+      go build  'backend/lambda/Leads_Module/getLeadCreationInfo/getLeadCreationInfo.go'
+      go build  'backend/lambda/Leads_Module/getLeadDetailonHyperLink/getLeadDetailonHyperLink.go'
+      go build  'backend/lambda/Leads_Module/getLeadsInfo/getLeadsInfo.go'
+      go build  'backend/lambda/Leads_Module/insertLeadDetails/insertLeadDetails.go'
+      go build  'backend/lambda/Leads_Module/reassignLead/reassignLead.go'
+      
+      # contacts------------#
+      go build  'backend/lambda/Contacts_Module/getAllContacts.go'
+
+      #---------------PO-MODULE-------------########
+      go build  'backend/lambda/PO_Module/editGCPODetails.go'
+      go build  'backend/lambda/PO_Module/insertGCPODetails.go'
+      go build  'backend/lambda/PO_Module/listPurchaseOrders.go'
+      go build  'backend/lambda/PO_Module/updateGcPoStatus.go'
+      go build  'backend/lambda/PO_Module/viewGCPODetails.go'
+      go build  'backend/lambda/PO_Module/getBalQuoteQtyForPoOrder.go'
+      go build  'backend/lambda/PO_Module/getPOFormInfo.go'
+      go build  'backend/lambda/PO_Module/getPoCreationInfo.go'
+      go build  'backend/lambda/PO_Module/getPortandOriginForPO.go'
+      go build  'backend/lambda/PO_Module/listTop3ApprovedPos.go'
+      go build  'backend/lambda/PO_Module/poDocumentsUpload.go'
+
+      # Accounts------########
+      go build  'backend/lambda/Accounts_Module/cvuAccountContactDetails/cvuAccountContactDetails.go'
+      go build  'backend/lambda/Accounts_Module/getAccountContacts/getAccountContacts.go'
+      go build  'backend/lambda/Accounts_Module/getAccountHyperlink/getAccountHyperlink.go'
+      go build  'backend/lambda/Accounts_Module/getAccountQuotes/getAccountQuotes.go'	  
+      go build  'backend/lambda/Accounts_Module/getAccountSamples/getAccountSamples.go'	  
+      go build  'backend/lambda/Accounts_Module/insertLeadIntoAccount/insertLeadIntoAccount.go' 
+      go build  'backend/lambda/Accounts_Module/getAllAccounts.go'
+      go build  'backend/lambda/Accounts_Module/reassignAccount/reassignAccount.go'
+
+      #--------------MRIN MODULE-----------#######
+      go build  'backend/lambda/MRIN_Module/getMrinCreationInfo.go'
+      go build  'backend/lambda/MRIN_Module/getMrinListForPoView.go'
+      go build  'backend/lambda/MRIN_Module/insertOrUpdateMrin.go'
+      go build  'backend/lambda/MRIN_Module/listMrins.go'
+      go build  'backend/lambda/MRIN_Module/topMrinDetail.go'
+      go build  'backend/lambda/MRIN_Module/updateMRINGCSpec.go'
+      go build  'backend/lambda/MRIN_Module/viewMrin.go'
+      
+
+      #pwd
+      #cd $(pwd)
+      ls
+      zip getGCDebitNoteCreationInfo.zip getGCDebitNoteCreationInfo
+      zip insertOrEditGCDebitNoteDetail.zip insertOrEditGCDebitNoteDetail
+      zip listGCDebitNoteDetails.zip listGCDebitNoteDetails
+      zip updateGcDebitNoteStatus.zip updateGcDebitNoteStatus
+      zip viewGCDebitNoteDetail.zip viewGCDebitNoteDetail
+      zip getGCCreationInfo.zip getGCCreationInfo
+      zip insertOrEditGCDetail.zip insertOrEditGCDetail
+      zip listGCDetails.zip listGCDetails
+      zip viewGCDetail.zip viewGCDetail
+      zip getAllQuoteLineItems.zip getAllQuoteLineItems
+      zip getAllQuotes.zip getAllQuotes
+      zip getQuotationCreationInfo.zip getQuotationCreationInfo
+      zip getQuoteLineCreationInfo.zip getQuoteLineCreationInfo
+      zip insertQuotationDetail.zip insertQuotationDetail
+      zip insertQuoteLineItemDetail.zip insertQuoteLineItemDetail
+      zip listApprovedQtLinesOnGc.zip listApprovedQtLinesOnGc
+      zip updateQuotationStatus.zip updateQuotationStatus
+      zip updateQuoteLineInfo.zip updateQuoteLineInfo
+
+      zip getAllSampleRequests.zip getAllSampleRequests
+      zip getcreateSRItemForm.zip getcreateSRItemForm
+      zip insertOrUpdateSampleLineItem.zip insertOrUpdateSampleLineItem
+      zip insertOrUpdateSampleRequest.zip insertOrUpdateSampleRequest
+      zip viewAndDeleteSampleLineItem.zip viewAndDeleteSampleLineItem
+      zip viewSampleRequest.zip viewSampleRequest
+
+      #####SUPPLIER MODULE------
+      zip cvuSupplier.zip cvuSupplier
+      zip listSuppliers.zip listSuppliers
+
+      ### USER MODULE----------------
+      zip changePassword.zip changePassword
+      zip confirmForgotPassword.zip confirmForgotPassword
+      zip disableUser.zip disableUser
+      zip enableUser.zip enableUser
+      zip forgotPassword.zip forgotPassword
+      zip getUserDetail.zip getUserDetail
+      zip getUserRole.zip getUserRole
+      zip getDepartmentNames.zip getDepartmentNames
+      zip getDivisions.zip getDivisions
+      zip getDelegatedApprover.zip getDelegatedApprover
+      zip insertUserDetails.zip insertUserDetails
+      zip login.zip login
+      zip registration.zip registration
+      zip getUsers.zip getUsers
+
+      ####LEADS MODULE-------------
+      zip getContactsInLeadtoAcc.zip getContactsInLeadtoAcc
+      zip getLeadCreationInfo.zip getLeadCreationInfo
+      zip getLeadDetailonHyperLink.zip getLeadDetailonHyperLink
+      zip getLeadsInfo.zip getLeadsInfo
+      zip insertLeadDetails.zip insertLeadDetails
+      zip reassignLead.zip reassignLead
+      
+      zip getAllContacts.zip getAllContacts
+
+      ###-------PO MODULE-----------------
+      zip editGCPODetails.zip editGCPODetails
+      zip insertGCPODetails.zip insertGCPODetails
+      zip listPurchaseOrders.zip listPurchaseOrders
+      zip updateGcPoStatus.zip updateGcPoStatus
+      zip viewGCPODetails.zip viewGCPODetails
+      zip getPOFormInfo.zip getPOFormInfo
+      zip getPoCreationInfo.zip getPoCreationInfo
+      zip getPortandOriginForPO.zip getPortandOriginForPO
+      zip listTop3ApprovedPos.zip listTop3ApprovedPos
+      zip poDocumentsUpload.zip poDocumentsUpload
+      zip getBalQuoteQtyForPoOrder.zip getBalQuoteQtyForPoOrder
+      
+      ####ACCOUNTS MODULE-----------------
+      zip cvuAccountContactDetails.zip cvuAccountContactDetails
+      zip getAccountContacts.zip getAccountContacts
+      zip getAccountHyperlink.zip getAccountHyperlink
+      zip getAccountQuotes.zip getAccountQuotes
+      zip getAccountSamples.zip getAccountSamples
+      zip insertLeadIntoAccount.zip insertLeadIntoAccount
+      zip getAllAccounts.zip getAllAccounts
+      zip reassignAccount.zip reassignAccount
+
+      #--------------MRIN MODULE-----------#######
+      zip getMrinCreationInfo.zip getMrinCreationInfo
+      zip getMrinListForPoView.zip getMrinListForPoView
+      zip insertOrUpdateMrin.zip insertOrUpdateMrin
+      zip listMrins.zip listMrins
+      zip topMrinDetail.zip topMrinDetail
+      zip updateMRINGCSpec.zip updateMRINGCSpec
+      zip viewMrin.zip viewMrin
+      
+   - name: Configure AWS Credentials
+     uses: aws-actions/configure-aws-credentials@v1
+     with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{secrets.AWS_DEFAULT_REGION}}
+          
+   - name: deploy
+     run: |
+       ######-----------DEBIT NOTE MODULE------------------
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getGCDebitNoteCreationInfo --region ap-south-1 --zip-file fileb://getGCDebitNoteCreationInfo.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-insertOrEditGCDebitNoteDetail --region ap-south-1 --zip-file fileb://insertOrEditGCDebitNoteDetail.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-listGCDebitNoteDetails --region ap-south-1 --zip-file fileb://listGCDebitNoteDetails.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-updateGcDebitNoteStatus --region ap-south-1 --zip-file fileb://updateGcDebitNoteStatus.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-viewGCDebitNoteDetail --region ap-south-1 --zip-file fileb://viewGCDebitNoteDetail.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getGCCreationInfo --region ap-south-1 --zip-file fileb://getGCCreationInfo.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-insertOrEditGCDetail --region ap-south-1 --zip-file fileb://insertOrEditGCDetail.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-listGCDetails --region ap-south-1 --zip-file fileb://listGCDetails.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-viewGCDetail --region ap-south-1 --zip-file fileb://viewGCDetail.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getAllQuoteLineItems --region ap-south-1 --zip-file fileb://getAllQuoteLineItems.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getAllQuotes --region ap-south-1 --zip-file fileb://getAllQuotes.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getQuotationCreationInfo --region ap-south-1 --zip-file fileb://getQuotationCreationInfo.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getQuoteLineCreationInfo --region ap-south-1 --zip-file fileb://getQuoteLineCreationInfo.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-insertQuotationDetail --region ap-south-1 --zip-file fileb://insertQuotationDetail.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-insertQuoteLineItemDetail --region ap-south-1 --zip-file fileb://insertQuoteLineItemDetail.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-listApprovedQtLinesOnGc --region ap-south-1 --zip-file fileb://listApprovedQtLinesOnGc.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-updateQuotationStatus --region ap-south-1 --zip-file fileb://updateQuotationStatus.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-updateQuoteLineInfo --region ap-south-1 --zip-file fileb://updateQuoteLineInfo.zip
+       
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getAllSampleRequests --region ap-south-1 --zip-file fileb://getAllSampleRequests.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getcreateSRItemForm --region ap-south-1 --zip-file fileb://getcreateSRItemForm.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-insertOrUpdateSampleLineItem --region ap-south-1 --zip-file fileb://insertOrUpdateSampleLineItem.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-insertOrUpdateSampleRequest --region ap-south-1 --zip-file fileb://insertOrUpdateSampleRequest.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-viewAndDeleteSampleLineItem --region ap-south-1 --zip-file fileb://viewAndDeleteSampleLineItem.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-viewSampleRequest --region ap-south-1 --zip-file fileb://viewSampleRequest.zip
+
+       ######----------SUPPLIER MODULE------
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-cvuSupplier --region ap-south-1 --zip-file fileb://cvuSupplier.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-listSuppliers --region ap-south-1 --zip-file fileb://listSuppliers.zip
+
+       ######-------User module---------##################
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-changePassword --region ap-south-1 --zip-file fileb://changePassword.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-confirmForgotPassword --region ap-south-1 --zip-file fileb://confirmForgotPassword.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-disableUser --region ap-south-1 --zip-file fileb://disableUser.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-enableUser --region ap-south-1 --zip-file fileb://enableUser.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-forgotPassword --region ap-south-1 --zip-file fileb://forgotPassword.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getUserDetail --region ap-south-1 --zip-file fileb://getUserDetail.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getDepartmentNames --region ap-south-1 --zip-file fileb://getDepartmentNames.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getUserRole --region ap-south-1 --zip-file fileb://getUserRole.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getDivisions --region ap-south-1 --zip-file fileb://getDivisions.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getDelegatedApprover --region ap-south-1 --zip-file fileb://getDelegatedApprover.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-insertUserDetails --region ap-south-1 --zip-file fileb://insertUserDetails.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-testenvLogin --region ap-south-1 --zip-file fileb://login.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-userRegistration --region ap-south-1 --zip-file fileb://registration.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getUsers --region ap-south-1 --zip-file fileb://getUsers.zip
+
+       ###########---------LEADS MODULE------------------------
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getContactsInLeadtoAcc --region ap-south-1 --zip-file fileb://getContactsInLeadtoAcc.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getLeadCreationInfo --region ap-south-1 --zip-file fileb://getLeadCreationInfo.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getLeadDetailonHyperLink --region ap-south-1 --zip-file fileb://getLeadDetailonHyperLink.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getLeadsInfo --region ap-south-1 --zip-file fileb://getLeadsInfo.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-insertLeadDetails --region ap-south-1 --zip-file fileb://insertLeadDetails.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-reassignLead --region ap-south-1 --zip-file fileb://reassignLead.zip
+       
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getAllContacts --region ap-south-1 --zip-file fileb://getAllContacts.zip
+       ###--------------------PO MODULE------------------------
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-editGCPODetails --region ap-south-1 --zip-file fileb://editGCPODetails.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-insertGCPODetails --region ap-south-1 --zip-file fileb://insertGCPODetails.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-listPurchaseOrders --region ap-south-1 --zip-file fileb://listPurchaseOrders.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-updateGcPoStatus --region ap-south-1 --zip-file fileb://updateGcPoStatus.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-viewGCPODetails --region ap-south-1 --zip-file fileb://viewGCPODetails.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getBalQuoteQtyForPoOrder --region ap-south-1 --zip-file fileb://getBalQuoteQtyForPoOrder.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getPOFormInfo --region ap-south-1 --zip-file fileb://getPOFormInfo.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getPoCreationInfo --region ap-south-1 --zip-file fileb://getPoCreationInfo.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getPortandOriginForPO --region ap-south-1 --zip-file fileb://getPortandOriginForPO.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-listTop3ApprovedPos --region ap-south-1 --zip-file fileb://listTop3ApprovedPos.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-poDocumentsUpload --region ap-south-1 --zip-file fileb://poDocumentsUpload.zip
+
+       #####-----------ACCOUNTS MODULE-------------
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-cvuAccountContactDetails --region ap-south-1 --zip-file fileb://cvuAccountContactDetails.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getAccountContacts --region ap-south-1 --zip-file fileb://getAccountContacts.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getAccountHyperlink --region ap-south-1 --zip-file fileb://getAccountHyperlink.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getAccountQuotes --region ap-south-1 --zip-file fileb://getAccountQuotes.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getAccountSamples --region ap-south-1 --zip-file fileb://getAccountSamples.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-insertLeadIntoAccount --region ap-south-1 --zip-file fileb://insertLeadIntoAccount.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getAllAccounts --region ap-south-1 --zip-file fileb://getAllAccounts.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-reassignAccount --region ap-south-1 --zip-file fileb://reassignAccount.zip
+
+       #--------------MRIN--MODULE-----------#######
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getMrinCreationInfo --region ap-south-1 --zip-file fileb://getMrinCreationInfo.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-getMrinListForPoView --region ap-south-1 --zip-file fileb://getMrinListForPoView.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-insertOrUpdateMrin --region ap-south-1 --zip-file fileb://insertOrUpdateMrin.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-listMrins --region ap-south-1 --zip-file fileb://listMrins.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-topMrinDetail --region ap-south-1 --zip-file fileb://topMrinDetail.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-updateMRINGCSpec --region ap-south-1 --zip-file fileb://updateMRINGCSpec.zip
+       aws lambda update-function-code --function-name ${{env.Deploy_Route_Url}}-viewMrin --region ap-south-1 --zip-file fileb://viewMrin.zip
+     
