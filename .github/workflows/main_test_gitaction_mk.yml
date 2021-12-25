@@ -34,18 +34,10 @@ jobs:
        printf '%s,' '${{ steps.files.outputs.added_modified }}'
 
    - name: Added files
+     id: added-files
      run: |
        mapfile -d ',' -t added_modified_files < <(printf '%s,' '${{ steps.files.outputs.added_modified }}')
-       for added_modified_file in "${added_modified_files[@]}"; do
-         echo "Do something with this ${added_modified_file}."
-       done
-   
-   - name: Removed files
-     run: |
-       mapfile -d ',' -t removed_files < <(printf '%s,' '${{ steps.files.outputs.removed }}')
-       for removed_file in "${removed_files[@]}"; do
-         echo "Do something with this ${removed_file}."
-       done
+       echo "::set-output name=addfiles::added_modified_files"
 
   #  - name: setup go
 
@@ -61,9 +53,12 @@ jobs:
   #      go mod init leapfrog-backend-Go-Lambdas
   #      go mod tidy
     
-  #  - name: codebuld    
-  #    run: |
-  #      env GOOS=linux
+   - name: codebuld    
+     run: |
+       for added_modified_file in "${steps.added-files.outputs.addfiles[@]}"; do
+         echo "Do something with this ${added_modified_file}."
+       done
+       
 
 
  
