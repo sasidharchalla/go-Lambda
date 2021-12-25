@@ -8,7 +8,7 @@ on:
 env:
   Deploy_Route_Url: ${{secrets.AWS_DEPLOY_DEV_ENV}}
   Lambda_Location: "backend/lambda/"
-  region_to_deploy_lambdas: "ap-south-1"
+  region_to_deploy_lambdas: ap-south-1
 
 jobs:
  build:
