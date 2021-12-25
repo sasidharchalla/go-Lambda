@@ -77,7 +77,7 @@ jobs:
          funcname=$(basename -s .go ${added_modified_file})
 
          echo "Checking if $funcname already exists"
-         found=$(aws lambda list-functions --region ${{env.region_to_deploy_lambdas}} --query 'Functions[].FunctionName'|grep $funcname)
+         found=$(aws lambda list-functions --region ${{env.region_to_deploy_lambdas}} --query 'Functions[*].FunctionName'|grep $funcname)
 
          echo "Deploying into AWS"
          if [[ -z $found ]]; then
