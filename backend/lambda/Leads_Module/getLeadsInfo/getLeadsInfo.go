@@ -17,6 +17,7 @@ const (
 	port     = 5432
 	user     = "postgres"
 	password = "Kasvibesc!!09"
+	
 	dbname   = "ccldevdb"
 )
 
