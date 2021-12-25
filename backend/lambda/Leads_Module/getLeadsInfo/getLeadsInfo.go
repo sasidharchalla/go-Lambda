@@ -16,6 +16,7 @@ const (
 	host     = "ccl-psql-dev.cclxlbtddgmn.ap-south-1.rds.amazonaws.com"
 	port     = 5432
 	user     = "postgres"
+	
 	password = "Kasvibesc!!09"
 	dbname   = "ccldevdb"
 )
