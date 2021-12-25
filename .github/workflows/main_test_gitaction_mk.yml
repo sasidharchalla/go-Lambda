@@ -3,8 +3,8 @@ on:
  push:
   branches: 
     - main
-  #paths:
-    #- backend/lambda/**
+  paths:
+    - backend/lambda/**
 env:
   Deploy_Route_Url: ${{secrets.AWS_DEPLOY_DEV_ENV}}
 
@@ -35,6 +35,13 @@ jobs:
        for added_modified_file in "${added_modified_files[@]}"; do
          echo "Do something with this ${added_modified_file}."
        done
+   
+   - name: verify removed files
+     run: |
+       mapfile -d ',' -t removed_files < <(printf '%s,' '${{ steps.files.outputs.removed }}')
+       for removed_file in "${removed_files[@]}"; do
+         echo "Do something with this ${removed_file}."
+       done
 
   #  - name: setup go
 
@@ -49,10 +56,5 @@ jobs:
      
   #      go mod init leapfrog-backend-Go-Lambdas
   #      go mod tidy
-
-   - name: Commit details
-     run: |
-     
-       echo ${{ github.event.head_commit.message }}
  
      
