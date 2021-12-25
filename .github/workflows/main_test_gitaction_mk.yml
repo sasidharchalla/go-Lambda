@@ -3,8 +3,8 @@ on:
  push:
   branches: 
     - main
-  paths:
-    - backend/lambda/**
+  #paths:
+    #- backend/lambda/**
 env:
   Deploy_Route_Url: ${{secrets.AWS_DEPLOY_DEV_ENV}}
 
