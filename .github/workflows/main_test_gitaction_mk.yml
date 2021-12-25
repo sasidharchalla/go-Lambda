@@ -3,10 +3,11 @@ on:
  push:
   branches: 
     - main
-  #paths:
-    #- backend/lambda/**
+  paths:
+    - backend/lambda/**
 env:
   Deploy_Route_Url: ${{secrets.AWS_DEPLOY_DEV_ENV}}
+  Lambda_Location: "backend/lambda/"
 
 jobs:
  build:
@@ -18,26 +19,26 @@ jobs:
   steps:
    - name: check the code
      uses: actions/Checkout@v2
-     
-   - name: test
-     run: echo "tested"
   
-   
    - name: Get changed files
      id: files
      uses: jitterbit/get-changed-files@v1
      with:
-       format: 'csv'
+       format: 'json'
 
-   - name: Files in single string
+   - name: Verify Added/Modified files for logging purposes
      run: |
-       printf '%s,' '${{ steps.files.outputs.added_modified }}'
-
-   - name: Added files
-     id: added-files
+       readarray -t added_modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
+       for added_modified_file in "${added_modified_files[@]}"; do
+         echo "${added_modified_file}"
+       done
+   
+   - name: Verify Removed files for logging purposes
      run: |
-       mapfile -d ',' -t added_modified_files < <(printf '%s,' '${{ steps.files.outputs.added_modified }}')
-       echo "::set-output name=addfiles::added_modified_files"
+       readarray -t removed_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.removed }}')"
+       for removed_file in ${removed_files[@]}; do
+         echo "${removed_file}."
+       done
 
   #  - name: setup go
 
@@ -55,9 +56,13 @@ jobs:
     
    - name: codebuld    
      run: |
-
-         echo "Do something with this ${steps.added-files.outputs.addfiles[0]}."
-       
+       env GOOS=linux
+       readarray -t added_modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
+       for added_modified_file in "${added_modified_files[@]}"; do
+         if [${added_modified_file}| grep -b -o ${Lambda_Location} == 0]
+         then
+           echo "${added_modified_file}"
+       done
 
 
  
