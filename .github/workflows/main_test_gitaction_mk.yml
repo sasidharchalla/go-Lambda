@@ -78,7 +78,7 @@ jobs:
 
          echo "Deploying into AWS"
          aws lambda update-function-code --function-name "$funcname" --region {{env.region_to_deploy_lambdas}} --zip-file fileb://${added_modified_file}.zip
-         
+
          echo "Deployment of $funcname Success"
          fi  
        done
