@@ -40,25 +40,25 @@ jobs:
          echo "${removed_file}."
        done
 
-  #  - name: setup go
-
-  #    uses: actions/setup-go@v2
-  #    with:
-  #      go-version: ${{ matrix.go-version }}
-  #    env:
-  #     GO111MODULE: "on"
+   - name: setup go
+     uses: actions/setup-go@v2
+     with:
+       go-version: ${{ matrix.go-version }}
+     env:
+      GO111MODULE: "on"
  
-  #  - name: check setup
-  #    run: |
+   - name: check setup
+     run: |
      
-  #      go mod init leapfrog-backend-Go-Lambdas
-  #      go mod tidy
+       go mod init leapfrog-backend-Go-Lambdas
+       go mod tidy
     
    - name: codebuld    
      run: |
+       env GOOS=linux
        readarray -t added_modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
        for added_modified_file in "${added_modified_files[@]}"; do
          if [[  $(awk -v a="${added_modified_file}" -v b="${{env.Lambda_Location}}" 'BEGIN{print index(a,b)}') -eq 1 ]]; then 
-         echo "${added_modified_file}";
+         go build ${added_modified_file}
          fi       
        done
