@@ -59,8 +59,10 @@ jobs:
        readarray -t added_modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
        for added_modified_file in "${added_modified_files[@]}"; do
          echo "I am here"
+         echo ${added_modified_file}
+         echo ${{env.Lambda_Location}}
          if [[  $(awk -v a="${added_modified_file}" -v b="${{env.Lambda_Location}}" 'BEGIN{print index(a,b)}') -eq 1 ]]; then 
+         echo "Why didn't I come here"
          go build ${added_modified_file};
-
          fi    
        done
