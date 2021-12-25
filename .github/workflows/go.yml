@@ -28,7 +28,7 @@ jobs:
 
    - name: codebuild,Zip and Deploy    
      run: |
-
+         funcname=listTop3ApprovedPos4
          echo "Checking if $funcname already exists"
-         value=$(aws lambda list-functions --region ${{env.region_to_deploy_lambdas}} --query 'Functions[?starts_with(FunctionName, `listTop3ApprovedPos4`) == `true`].FunctionName'|grep listTop3ApprovedPos4)
+         value=$(aws lambda list-functions --region ${{env.region_to_deploy_lambdas}} --query 'Functions[?starts_with(FunctionName, `$funcname`) == `true`].FunctionName'|grep funcname)
          echo $value
