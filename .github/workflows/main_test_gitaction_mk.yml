@@ -61,7 +61,7 @@ jobs:
        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
        aws-region: ${{secrets.AWS_DEFAULT_REGION}}
 
-   - name: codebuild,Zip and Deploy    
+   - name: Codebuild,Zip and Deploy    
      run: |
        env GOOS=linux
        readarray -t added_modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
@@ -73,22 +73,21 @@ jobs:
            echo "Zipping ${added_modified_file}"
            zip ${added_modified_file}.zip ${added_modified_file}
 
-           echo "Name of the go function"
+           echo "*********Retrieving name of  the go function*********"
            funcname=$(basename -s .go ${added_modified_file})
+           echo "Name of the go function is $funcname"
 
-           echo "Checking if $funcname already exists"
+           echo "*********Checking if $funcname already exists*********"
            found=$(aws lambda list-functions --region ${{env.region_to_deploy_lambdas}} --query 'Functions[*].FunctionName'|grep $funcname || echo 0)
 
-           echo Found value is $found
-
-           echo "Deploying into AWS"
+           echo "*********Deploying into AWS*********"
            if [[ $found == *"$funcname"* ]]; then
 
              aws lambda update-function-code --function-name "$funcname"  \
              --region ${{env.region_to_deploy_lambdas}} \
              --zip-file fileb://${added_modified_file}.zip
 
-             echo "Update of $funcname Success"
+             echo "*********Update of $funcname Success*********"
          
            else
              aws lambda create-function --function-name "$funcname" --runtime go1.x \
@@ -96,7 +95,7 @@ jobs:
              --role arn:aws:iam::740915728773:role/service-role/hello-role-xshw5xbe \
              --zip-file fileb://${added_modified_file}.zip
 
-             echo "Creation of $funcname Success"
+             echo "*********Creation of $funcname Success*********"
            fi
          fi
        done
