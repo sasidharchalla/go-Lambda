@@ -59,7 +59,7 @@ jobs:
        env GOOS=linux
        readarray -t added_modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
        for added_modified_file in "${added_modified_files[@]}"; do
-         if [(echo "${added_modified_file}"| grep -b -o ${{env.Lambda_Location}}) == 0]
+         if [[echo "${added_modified_file}"| grep -b -o ${{env.Lambda_Location}}] == 0]
          then
            echo "${added_modified_file}"
          fi
