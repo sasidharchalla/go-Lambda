@@ -30,7 +30,4 @@ jobs:
      run: |
 
          echo "Checking if $funcname already exists"
-         found=$(aws lambda list-functions --region ${{env.region_to_deploy_lambdas}} --query 'Functions[?starts_with(FunctionName, `listTop3ApprovedPos4.go`) == `true`].FunctionName'|grep listTop3ApprovedPos4.go)
-         if [[ -z $found ]]; then
-         echo "hi"
-         fi
+         aws lambda list-functions --region ${{env.region_to_deploy_lambdas}} --query 'Functions[?starts_with(FunctionName, `listTop3ApprovedPos4.go`) == `true`].FunctionName'|grep listTop3ApprovedPos4.go >output.log
