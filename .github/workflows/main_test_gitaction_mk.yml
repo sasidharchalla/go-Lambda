@@ -14,7 +14,6 @@ jobs:
  build:
  
   runs-on: ubuntu-latest
-  continue-on-error: true
   strategy: 
     matrix:
       go-version: [1.17]
@@ -78,7 +77,7 @@ jobs:
          funcname=$(basename -s .go ${added_modified_file})
 
          echo "Checking if $funcname already exists"
-         found=$(aws lambda list-functions --no-verify-ssl --region ${{env.region_to_deploy_lambdas}} --query 'Functions[?starts_with(FunctionName, `$funcname`) == `true`].FunctionName'|grep $funcname)
+         found=$(aws lambda list-functions --region ${{env.region_to_deploy_lambdas}} --query 'Functions[?starts_with(FunctionName, `$funcname`) == `true`].FunctionName'|grep $funcname)
 
          echo "Deploying into AWS"
          if [[ -z $found ]]; then
