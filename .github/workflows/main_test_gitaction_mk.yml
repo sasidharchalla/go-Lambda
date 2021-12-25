@@ -62,6 +62,7 @@ jobs:
          if [${added_modified_file}| grep -b -o ${Lambda_Location} == 0]
          then
            echo "${added_modified_file}"
+         fi
        done
 
 
