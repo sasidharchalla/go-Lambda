@@ -21,21 +21,36 @@ jobs:
      
    - name: test
      run: echo "tested"
-   - name: setup go
-
-     uses: actions/setup-go@v2
+  
+   
+   - name: Get changed files
+     id: files
+     uses: jitterbit/get-changed-files@v1
      with:
-       go-version: ${{ matrix.go-version }}
-     env:
-      GO111MODULE: "on"
- 
-   - name: check setup
+       format: 'csv'
+
+   - name: verify files
      run: |
-     
-       go mod init leapfrog-backend-Go-Lambdas
-       go mod tidy
+       mapfile -d ',' -t added_modified_files < <(printf '%s,' '${{ steps.files.outputs.added_modified }}')
+       for added_modified_file in "${added_modified_files[@]}"; do
+         echo "Do something with this ${added_modified_file}."
+       done
+
+  #  - name: setup go
+
+  #    uses: actions/setup-go@v2
+  #    with:
+  #      go-version: ${{ matrix.go-version }}
+  #    env:
+  #     GO111MODULE: "on"
  
-   - name: check setup
+  #  - name: check setup
+  #    run: |
+     
+  #      go mod init leapfrog-backend-Go-Lambdas
+  #      go mod tidy
+
+   - name: Commit details
      run: |
      
        echo ${{ github.event.head_commit.message }}
