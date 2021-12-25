@@ -59,7 +59,7 @@ jobs:
        readarray -t added_modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
        for added_modified_file in "${added_modified_files[@]}"; do
          if [[  $(awk -v a="${added_modified_file}" -v b="${{env.Lambda_Location}}" 'BEGIN{print index(a,b)}') -eq 1 ]]; then 
-         go build ${added_modified_file};
-         ls 
+         go build -o ${added_modified_file} ${added_modified_file};
+         cat ${added_modified_file}
          fi    
        done
