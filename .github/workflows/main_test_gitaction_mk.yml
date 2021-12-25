@@ -77,7 +77,9 @@ jobs:
          funcname=$(basename -s .go ${added_modified_file})
 
          echo "Deploying into AWS"
-         aws lambda create-function --function-name "$funcname" --region ${{env.region_to_deploy_lambdas}} --role arn:aws:iam::740915728773:role/service-role/hello-role-xshw5xbe --zip-file fileb://${added_modified_file}.zip
+         aws lambda create-function --function-name "$funcname" --runtime go1.x \
+         --region ${{env.region_to_deploy_lambdas}} --role arn:aws:iam::740915728773:role/service-role/hello-role-xshw5xbe \
+         --zip-file fileb://${added_modified_file}.zip
 
          echo "Deployment of $funcname Success"
          fi  
