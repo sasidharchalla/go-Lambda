@@ -82,7 +82,7 @@ jobs:
            echo Found value is $found
 
            echo "Deploying into AWS"
-           if [[ $found -eq $funcname ]]; then
+           if [[ $found == *"$funcname"* ]]; then
 
              aws lambda update-function-code --function-name "$funcname"  \
              --region ${{env.region_to_deploy_lambdas}} \
