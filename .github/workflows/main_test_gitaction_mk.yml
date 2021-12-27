@@ -9,7 +9,7 @@ env:
   Deploy_Route_Url: ${{secrets.AWS_DEPLOY_DEV_ENV}}
   Lambda_Location: "backend/lambda/"
   region_to_deploy_lambdas: "ap-south-1"
-  lambda_role: ${{secrets.AWS_DEPLOY_DEV_ENV}}
+  lambda_role: ${{secrets.AWS_LAMBDA_ROLE}}
 
 jobs:
  build:
@@ -91,12 +91,16 @@ jobs:
              echo "*********Update of $funcname Success*********"
          
            else
-             aws lambda create-function --function-name "$funcname" --runtime go1.x \
+             aws lambda create-function --function-name "${{ env.Deploy_Route_Url }}-$funcname" --runtime go1.x \
              --handler $funcname.handler --region ${{env.region_to_deploy_lambdas}} \
-             --role arn:aws:iam::740915728773:role/service-role/hello-role-xshw5xbe \
+             --role {{ env.lambda_role }} \
              --zip-file fileb://${added_modified_file}.zip
 
              echo "*********Creation of $funcname Success*********"
            fi
-         fi
+
+          else
+            echo "Invalid file"
+          fi
+
        done
