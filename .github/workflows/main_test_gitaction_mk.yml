@@ -93,7 +93,7 @@ jobs:
            else
              aws lambda create-function --function-name "${{ env.Deploy_Route_Url }}-$funcname" --runtime go1.x \
              --handler $funcname.handler --region ${{env.region_to_deploy_lambdas}} \
-             --role {{ env.lambda_role }} \
+             --role ${{ env.lambda_role }} \
              --zip-file fileb://${added_modified_file}.zip
 
              echo "*********Creation of $funcname Success*********"
