@@ -84,7 +84,7 @@ jobs:
            echo "*********Deploying into AWS*********"
            if [[ $found == *"$funcname"* ]]; then
 
-             aws lambda update-function-code --function-name "$funcname"  \
+             aws lambda update-function-code --function-name "${{ env.Deploy_Route_Url }}-$funcname"  \
              --region ${{env.region_to_deploy_lambdas}} \
              --zip-file fileb://${added_modified_file}.zip
 
